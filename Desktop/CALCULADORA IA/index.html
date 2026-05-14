@@ -526,7 +526,7 @@
     </div>
 
     <script>
-        const OPENAI_API_KEY = "SUA_CHAVE_AQUI";
+        // Configurações
         const WHATSAPP_NUM   = "5531973432021";
 
         let historicoChat      = [];
@@ -695,11 +695,10 @@
             document.getElementById("chat-messages").appendChild(loading);
 
             try {
-                const res = await fetch("https://api.openai.com/v1/chat/completions", {
+                const res = await fetch("/api/chat", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json", "Authorization": `Bearer ${OPENAI_API_KEY}` },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        model: "gpt-4o",
                         messages: [
                             {
                                 role: "system", 
@@ -722,10 +721,14 @@
                 });
                 const data = await res.json();
                 loading.remove();
+                
+                if(data.error) throw new Error(data.error);
+
                 const resp = data.choices[0].message.content;
                 adicionarMensagem("ia", resp);
                 historicoChat.push({role: "assistant", content: resp});
             } catch(e) {
+                console.error("Erro no Chat:", e);
                 loading.innerText = "Me chama no WhatsApp que te explico tudo melhor! 👇";
             }
         }
